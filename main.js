@@ -18,6 +18,7 @@ const TIMER=document.querySelector('.timer span');
 const PB=document.getElementById('problem');
 const game_start_button = document.getElementById("start-img-button")
 const isTouchDevice = (navigator.maxTouchPoints || 'ontouchstart' in document.documentElement);
+const token = new URL(window.location.href).searchParams.get('token')
 
 let score = 0
 let answer = 0 
@@ -998,4 +999,24 @@ window.addEventListener('touchend', (e) => {
 
     cursor.classList.remove('active-touch')
     
+})
+
+function parseJWT(token) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
+window.addEventListener('load', () => {
+    if(!!token) {
+        setting_game()
+        let data = parseJWT(token);
+        console.log(data)
+        user_School_Number = data.school_number;
+        school_number({keyCode: 13});
+    }
 })
